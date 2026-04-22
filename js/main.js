@@ -37,13 +37,16 @@ const Storage = {
 
 // ─── Palette Rendering ────────────────────────────────────────
 
+// ─── Palette Rendering (النسخة النهائية المحسنة) ────────────────────────────────────────
 function renderPaletteBar(colors, name) {
   const bar = document.getElementById("palette-bar");
   const nameEl = document.getElementById("palette-name");
 
-  // Animate out then in
+  if (!bar) return;
+
+  // Fade out
+  bar.style.transition = "opacity 0.2s ease";
   bar.style.opacity = "0";
-  bar.style.transform = "scaleX(0.96)";
 
   setTimeout(() => {
     bar.innerHTML = "";
@@ -56,14 +59,17 @@ function renderPaletteBar(colors, name) {
       const swatch = document.createElement("div");
       swatch.className = "palette-swatch swatch-pop";
       swatch.style.cssText = `background:${hex}; animation-delay:${i * 40}ms`;
-      swatch.setAttribute("role", "listitem");
+      swatch.setAttribute("role", "button");
+      swatch.setAttribute("tabindex", "0");
       swatch.setAttribute("aria-label", `${colorName}: ${hex}`);
-      swatch.title = `${colorName} — ${hex}`;
 
       // Info overlay
       const info = document.createElement("div");
       info.className = "swatch-info";
-      info.innerHTML = `<span class="swatch-name">${colorName}</span><span class="swatch-hex">${hex.toUpperCase()}</span>`;
+      info.innerHTML = `
+        <span class="swatch-name">${colorName}</span>
+        <span class="swatch-hex">${hex.toUpperCase()}</span>
+      `;
 
       // Copy button
       const copyBtn = document.createElement("button");
@@ -79,29 +85,31 @@ function renderPaletteBar(colors, name) {
       });
 
       swatch.addEventListener("click", () => openColorModal(hex, colorName));
+      swatch.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") openColorModal(hex, colorName);
+      });
 
       swatch.appendChild(info);
       swatch.appendChild(copyBtn);
       bar.appendChild(swatch);
     });
 
-    // Animate in
+    // Fade in + update everything
     bar.style.transition = "opacity 0.4s ease, transform 0.4s ease";
     bar.style.opacity = "1";
     bar.style.transform = "scaleX(1)";
 
-    // Update name
-    if (nameEl) nameEl.textContent = `— ${name}`;
+    if (nameEl) nameEl.textContent = `— ${name || "Mixed Media"}`;
 
-    // Update background tint
     updateBackgroundAccent(colors);
-
-    // Update live preview
     renderLivePreview(colors);
-
-    // Update logo gradient
     updateLogoGradient(colors);
-  }, 200);
+    renderContrastChecker(colors);
+
+    announceToScreenReader(
+      `Palette updated: ${name || "Mixed Media"}. ${colors.length} colors.`,
+    );
+  }, 180);
 }
 
 function updateBackgroundAccent(colors) {
@@ -640,24 +648,29 @@ function hideExportPanel() {
 
 // ─── Panel Toggle ─────────────────────────────────────────────
 
-function togglePanel(panelId, buttonId) {
+function togglePanel(panelId) {
   const panel = document.getElementById(panelId);
   if (!panel) return;
 
   const isHidden = panel.classList.contains("hidden");
 
-  // Hide all side panels
-  ["history-panel", "favorites-panel"].forEach((id) => {
+  ["history-panel", "favorites-panel", "export-panel"].forEach((id) => {
     const p = document.getElementById(id);
     if (p) p.classList.add("hidden");
   });
 
   if (isHidden) {
     panel.classList.remove("hidden");
+
+    panel.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+
     panel.style.opacity = "0";
-    panel.style.transform = "translateY(8px)";
+    panel.style.transform = "translateY(20px)";
     requestAnimationFrame(() => {
-      panel.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+      panel.style.transition = "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
       panel.style.opacity = "1";
       panel.style.transform = "translateY(0)";
     });
@@ -894,13 +907,13 @@ function bindEvents() {
 
   // History panel
   document.getElementById("btn-history")?.addEventListener("click", () => {
-    togglePanel("history-panel", "btn-history");
+    togglePanel("history-panel");
     renderHistoryPanel();
   });
 
   // Favorites panel
   document.getElementById("btn-favorites")?.addEventListener("click", () => {
-    togglePanel("favorites-panel", "btn-favorites");
+    togglePanel("favorites-panel");
   });
 
   // Clear history
