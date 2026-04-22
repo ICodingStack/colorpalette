@@ -43,6 +43,11 @@
 - **Phone** — Mobile screen layout
 - **Poster** — Typographic color poster
 
+## 🚀 Live Demo
+
+**[Open ColorPalette → https://icodingstack.github.io/colorpalette](https://icodingstack.github.io/colorpalette)**
+
+
 ### Export Formats
 | Format | Output |
 |--------|--------|
