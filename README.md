@@ -2,7 +2,7 @@
 ### *The Most Elegant & Artistic Color Palette Generator*
 
 > **"Artistic Palettes That Inspire"** — A premium, glassmorphism-based color tool that feels luxurious, addictive, and unlike anything else on the internet.
-
+![ColorPalette Preview](https://icodingstack.github.io/colorpalette/assets/preview.png)
 ---
 
 ## ✦ Features
