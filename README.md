@@ -127,3 +127,5 @@ colorpalette/
 ## 📄 License
 
 MIT © ColorPalette — See [LICENSE](./LICENSE)
+
+Made with ❤️ by : [BlackBirdo](https://BlackBirdo.com)
